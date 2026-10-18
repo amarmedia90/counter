@@ -119,11 +119,7 @@ class _MyHomePageState extends State<MyHomePage> {
             children: [
               const SizedBox(height: 30),
               // Counter display
-              const Text('You have pushed the button this many times:'),
-              Text(
-                '$_counter',
-                style: Theme.of(context).textTheme.headlineMedium,
-              ),
+              CounterWidget(count: _counter),
               
               const SizedBox(height: 40), // Padding before color controls
               
@@ -176,6 +172,26 @@ class _MyHomePageState extends State<MyHomePage> {
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ),
+    );
+  }
+}
+
+// New Stateless Widget for the counter display
+class CounterWidget extends StatelessWidget {
+  final int count;
+
+  const CounterWidget({super.key, required this.count});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        const Text('You have pushed the button this many times:'),
+        Text(
+          '$count',
+          style: Theme.of(context).textTheme.headlineMedium,
+        ),
+      ],
     );
   }
 }
