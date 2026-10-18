@@ -27,7 +27,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    final customColor = Color.fromARGB(_red, _green, _blue, 255);
+    final customColor = Color.fromARGB(255, _red, _green, _blue);
 
     return MaterialApp(
       title: 'Flutter Counter',
