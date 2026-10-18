@@ -111,29 +111,53 @@ class _MyHomePageState extends State<MyHomePage> {
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
+      body: Column(
           mainAxisAlignment: .center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const Text('You have pushed the button this many times:'),
             Text(
               '$_counter',
               style: Theme.of(context).textTheme.headlineMedium,
+            ),
+            const SizedBox(height: 20),
+            // Red Color Setting
+            Text('Red Value: ${widget.red}'),
+            Slider(
+              value: widget.red.toDouble(),
+              min: 0,
+              max: 255,
+              onChanged: (value) {
+                if (widget.onRedChange != null) {
+                  widget.onRedChange!(value.toInt());
+                }
+              },
+            ),
+            const SizedBox(height: 20),
+            // Green Color Setting
+            Text('Green Value: ${widget.green}'),
+            Slider(
+              value: widget.green.toDouble(),
+              min: 0,
+              max: 255,
+              onChanged: (value) {
+                if (widget.onGreenChange != null) {
+                  widget.onGreenChange!(value.toInt());
+                }
+              },
+            ),
+            const SizedBox(height: 20),
+            // Blue Color Setting
+            Text('Blue Value: ${widget.blue}'),
+            Slider(
+              value: widget.blue.toDouble(),
+              min: 0,
+              max: 255,
+              onChanged: (value) {
+                if (widget.onBlueChange != null) {
+                  widget.onBlueChange!(value.toInt());
+                }
+              },
             ),
           ],
         ),
