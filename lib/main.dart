@@ -4,31 +4,36 @@ void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  // State variables for the theme color (R, G, B)
+  int _red = 255; // Default color (Yellow)
+  int _green = 255;
+  int _blue = 0;
+
+  void _updateColor(int r, int g, int b) {
+    setState(() {
+      _red = r;
+      _green = g;
+      _blue = b;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final customColor = Color.fromARGB(_red, _green, _blue, 255);
+
     return MaterialApp(
       title: 'Flutter Counter',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: .fromSeed(seedColor: Colors.yellow),
+        colorScheme: ColorScheme.fromSeed(seedColor: customColor),
+        useMaterial3: true,
       ),
       home: const MyHomePage(title: 'Counter'),
     );
