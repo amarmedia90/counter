@@ -41,7 +41,14 @@ class _MyAppState extends State<MyApp> {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+  const MyHomePage({super.key, required this.title,
+    this.red = 255,
+    this.green = 255,
+    this.blue = 0,
+    this.onRedChange,
+    this.onGreenChange,
+    this.onBlueChange,
+  });
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -53,6 +60,12 @@ class MyHomePage extends StatefulWidget {
   // always marked "final".
 
   final String title;
+  final int red;
+  final int green;
+  final int blue;
+  final ValueChanged<int>? onRedChange;
+  final ValueChanged<int>? onGreenChange;
+  final ValueChanged<int>? onBlueChange;
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
