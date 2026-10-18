@@ -111,56 +111,66 @@ class _MyHomePageState extends State<MyHomePage> {
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      body: Column(
-          mainAxisAlignment: .center,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-            const SizedBox(height: 20),
-            // Red Color Setting
-            Text('Red Value: ${widget.red}'),
-            Slider(
-              value: widget.red.toDouble(),
-              min: 0,
-              max: 255,
-              onChanged: (value) {
-                if (widget.onRedChange != null) {
-                  widget.onRedChange!(value.toInt());
-                }
-              },
-            ),
-            const SizedBox(height: 20),
-            // Green Color Setting
-            Text('Green Value: ${widget.green}'),
-            Slider(
-              value: widget.green.toDouble(),
-              min: 0,
-              max: 255,
-              onChanged: (value) {
-                if (widget.onGreenChange != null) {
-                  widget.onGreenChange!(value.toInt());
-                }
-              },
-            ),
-            const SizedBox(height: 20),
-            // Blue Color Setting
-            Text('Blue Value: ${widget.blue}'),
-            Slider(
-              value: widget.blue.toDouble(),
-              min: 0,
-              max: 255,
-              onChanged: (value) {
-                if (widget.onBlueChange != null) {
-                  widget.onBlueChange!(value.toInt());
-                }
-              },
-            ),
-          ],
-        ),
+      body: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: .center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const SizedBox(height: 30),
+              // Counter display
+              const Text('You have pushed the button this many times:'),
+              Text(
+                '$_counter',
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
+              
+              const SizedBox(height: 40), // Padding before color controls
+              
+              // Red Color Setting
+              Text('Red Value: ${widget.red}'),
+              Slider(
+                value: widget.red.toDouble(),
+                min: 0,
+                max: 255,
+                onChanged: (value) {
+                  if (widget.onRedChange != null) {
+                    widget.onRedChange!(value.toInt());
+                  }
+                },
+              ),
+              const SizedBox(height: 30),
+              
+              // Green Color Setting
+              Text('Green Value: ${widget.green}'),
+              Slider(
+                value: widget.green.toDouble(),
+                min: 0,
+                max: 255,
+                onChanged: (value) {
+                  if (widget.onGreenChange != null) {
+                    widget.onGreenChange!(value.toInt());
+                  }
+                },
+              ),
+              const SizedBox(height: 30),
+              
+              // Blue Color Setting
+              Text('Blue Value: ${widget.blue}'),
+              Slider(
+                value: widget.blue.toDouble(),
+                min: 0,
+                max: 255,
+                onChanged: (value) {
+                  if (widget.onBlueChange != null) {
+                    widget.onBlueChange!(value.toInt());
+                  }
+                },
+              ),
+              const SizedBox(height: 30),
+            ],
+          ),
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: _incrementCounter,
         tooltip: 'Increment',
