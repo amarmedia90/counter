@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+const _counterChannel = MethodChannel('com.counter.counter/counter');
 
 void main() {
   runApp(const MyApp());
@@ -81,16 +84,48 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+  bool _isLoadingCounter = true;
 
-  void _incrementCounter() {
+  @override
+  void initState() {
+    super.initState();
+    _loadCounter();
+  }
+
+  Future<void> _loadCounter() async {
+    var savedCount = 0;
+    try {
+      savedCount = await _counterChannel.invokeMethod<int>('loadCounter') ?? 0;
+    } catch (error) {
+      debugPrint('Could not load the saved counter: $error');
+    }
+
+    if (!mounted) return;
+    setState(() {
+      _counter = savedCount;
+      _isLoadingCounter = false;
+    });
+  }
+
+  Future<void> _incrementCounter() async {
+    final updatedCount = _counter + 1;
     setState(() {
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
       // so that the display can reflect the updated values. If we changed
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
-      _counter++;
+      _counter = updatedCount;
     });
+
+    try {
+      await _counterChannel.invokeMethod<void>(
+        'saveCounter',
+        {'count': updatedCount},
+      );
+    } catch (error) {
+      debugPrint('Could not save the counter or refresh its home-screen widget: $error');
+    }
   }
 
   @override
@@ -168,7 +203,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+        onPressed: _isLoadingCounter ? null : _incrementCounter,
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ),

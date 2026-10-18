@@ -3,9 +3,9 @@ package com.counter.counter
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
-import android.content.SharedPreferences
 import android.content.Context
-import android.content.ContextImpl
+import android.content.ComponentName
+import android.appwidget.AppWidgetManager
 
 class MainActivity : FlutterActivity() {
   private val channel = "com.counter.counter/counter"
@@ -13,21 +13,26 @@ class MainActivity : FlutterActivity() {
   override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
     super.configureFlutterEngine(flutterEngine)
     
-    MethodChannel(channel).setMethodCallHandler { call, result ->
+    MethodChannel(flutterEngine.dartExecutor.binaryMessenger, channel)
+      .setMethodCallHandler { call, result ->
       when (call.method) {
         "loadCounter" -> {
-          // Step 9: Load counter from SharedPreferences
-          val prefs = getSharedPreferences("counter_prefs", Context.MODE_PRIVATE) as SharedPreferences
-          val savedCount = prefs.getInt("counter", 0)
+          val prefs = getSharedPreferences(CounterWidgetProvider.PREFERENCES_NAME, Context.MODE_PRIVATE)
+          val savedCount = prefs.getInt(CounterWidgetProvider.COUNTER_KEY, 0)
           result.success(savedCount)
         }
         "saveCounter" -> {
           val countToSave = call.argument<Int>("count")
           if (countToSave != null) {
-            // Step 12: Save to SharedPreferences
-            val prefs = getSharedPreferences("counter_prefs", Context.MODE_PRIVATE) as SharedPreferences
-            prefs.edit().putInt("counter", countToSave).apply()
-            // Step 13: (This will be handled by the WidgetProvider later)
+            getSharedPreferences(CounterWidgetProvider.PREFERENCES_NAME, Context.MODE_PRIVATE)
+              .edit()
+              .putInt(CounterWidgetProvider.COUNTER_KEY, countToSave)
+              .apply()
+
+            val manager = AppWidgetManager.getInstance(this)
+            val component = ComponentName(this, CounterWidgetProvider::class.java)
+            val widgetIds = manager.getAppWidgetIds(component)
+            CounterWidgetProvider().onUpdate(this, manager, widgetIds)
             result.success(true)
           } else {
             result.error("INVALID_ARGUMENT", "Count argument is required", null)
@@ -38,6 +43,6 @@ class MainActivity : FlutterActivity() {
           result.notImplemented()
         }
       }
-    }
+      }
   }
 }
