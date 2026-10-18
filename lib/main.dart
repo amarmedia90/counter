@@ -35,7 +35,15 @@ class _MyAppState extends State<MyApp> {
         colorScheme: ColorScheme.fromSeed(seedColor: customColor),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Counter'),
+      home: MyHomePage(
+        title: 'Counter',
+        red: _red,
+        green: _green,
+        blue: _blue,
+        onRedChange: (value) => _updateColor(value, _green, _blue),
+        onGreenChange: (value) => _updateColor(_red, value, _blue),
+        onBlueChange: (value) => _updateColor(_red, _green, value),
+      ),
     );
   }
 }
