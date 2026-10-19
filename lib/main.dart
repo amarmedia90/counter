@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 const _counterChannel = MethodChannel('com.counter.counter/counter');
+const _defaultWidgetTransparency = 22;
+const _defaultWidgetShadow = 50;
 
 void main() {
   runApp(const MyApp());
@@ -85,6 +87,8 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
   bool _isLoadingCounter = true;
+  int _widgetTransparency = _defaultWidgetTransparency;
+  int _widgetShadow = _defaultWidgetShadow;
 
   @override
   void initState() {
@@ -94,17 +98,40 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<void> _loadCounter() async {
     var savedCount = 0;
+    var transparency = _defaultWidgetTransparency;
+    var shadow = _defaultWidgetShadow;
     try {
       savedCount = await _counterChannel.invokeMethod<int>('loadCounter') ?? 0;
+      final appearance = await _counterChannel.invokeMapMethod<String, dynamic>(
+        'loadWidgetAppearance',
+      );
+      transparency = appearance?['transparency'] as int? ?? transparency;
+      shadow = appearance?['shadow'] as int? ?? shadow;
     } catch (error) {
-      debugPrint('Could not load the saved counter: $error');
+      debugPrint('Could not load the saved counter or widget appearance: $error');
     }
 
     if (!mounted) return;
     setState(() {
       _counter = savedCount;
+      _widgetTransparency = transparency;
+      _widgetShadow = shadow;
       _isLoadingCounter = false;
     });
+  }
+
+  Future<void> _saveWidgetAppearance() async {
+    try {
+      await _counterChannel.invokeMethod<void>(
+        'saveWidgetAppearance',
+        {
+          'transparency': _widgetTransparency,
+          'shadow': _widgetShadow,
+        },
+      );
+    } catch (error) {
+      debugPrint('Could not save the home-screen widget appearance: $error');
+    }
   }
 
   Future<void> _incrementCounter() async {
@@ -154,10 +181,39 @@ class _MyHomePageState extends State<MyHomePage> {
             children: [
               const SizedBox(height: 30),
               // Counter display
-              CounterWidget(count: _counter),
+              CounterWidget(
+                count: _counter,
+                transparencyPercent: _widgetTransparency,
+                shadowPercent: _widgetShadow,
+              ),
               
               const SizedBox(height: 40), // Padding before color controls
-              
+              Text('Widget transparency: $_widgetTransparency%'),
+              Slider(
+                value: _widgetTransparency.toDouble(),
+                min: 0,
+                max: 100,
+                label: '$_widgetTransparency%',
+                onChanged: _isLoadingCounter ? null : (value) {
+                  setState(() {
+                    _widgetTransparency = value.round();
+                  });
+                },
+                onChangeEnd: _isLoadingCounter ? null : (_) => _saveWidgetAppearance(),
+              ),
+              Text('Widget drop shadow: $_widgetShadow%'),
+              Slider(
+                value: _widgetShadow.toDouble(),
+                min: 0,
+                max: 100,
+                label: '$_widgetShadow%',
+                onChanged: _isLoadingCounter ? null : (value) {
+                  setState(() {
+                    _widgetShadow = value.round();
+                  });
+                },
+                onChangeEnd: _isLoadingCounter ? null : (_) => _saveWidgetAppearance(),
+              ),
               // Red Color Setting
               Text('Red Value: ${widget.red}'),
               Slider(
@@ -211,22 +267,46 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-// New Stateless Widget for the counter display
+// New Stateless Widget for the counter display with frosted glass effect
 class CounterWidget extends StatelessWidget {
   final int count;
+  final int transparencyPercent;
+  final int shadowPercent;
 
-  const CounterWidget({super.key, required this.count});
+  const CounterWidget({
+    super.key,
+    required this.count,
+    required this.transparencyPercent,
+    required this.shadowPercent,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const Text('You have pushed the button this many times:'),
-        Text(
-          '$count',
-          style: Theme.of(context).textTheme.headlineMedium,
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        color: Colors.black.withValues(
+          alpha: (100 - transparencyPercent) / 100,
         ),
-      ],
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(
+              alpha: shadowPercent / 100 * 0.45,
+            ),
+            blurRadius: shadowPercent / 100 * 18,
+            offset: Offset(0, shadowPercent / 100 * 8),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          const Text('You have pushed the button this many times:'),
+          Text(
+            '$count',
+            style: Theme.of(context).textTheme.headlineMedium,
+          ),
+        ],
+      ),
     );
   }
 }

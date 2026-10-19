@@ -21,6 +21,36 @@ class MainActivity : FlutterActivity() {
           val savedCount = prefs.getInt(CounterWidgetProvider.COUNTER_KEY, 0)
           result.success(savedCount)
         }
+        "loadWidgetAppearance" -> {
+          val prefs = getSharedPreferences(CounterWidgetProvider.PREFERENCES_NAME, Context.MODE_PRIVATE)
+          result.success(
+            mapOf(
+              "transparency" to prefs.getInt(
+                CounterWidgetProvider.TRANSPARENCY_KEY,
+                CounterWidgetProvider.DEFAULT_TRANSPARENCY,
+              ),
+              "shadow" to prefs.getInt(
+                CounterWidgetProvider.SHADOW_KEY,
+                CounterWidgetProvider.DEFAULT_SHADOW,
+              ),
+            ),
+          )
+        }
+        "saveWidgetAppearance" -> {
+          val transparency = call.argument<Int>("transparency")
+          val shadow = call.argument<Int>("shadow")
+          if (transparency == null || shadow == null) {
+            result.error("INVALID_ARGUMENT", "Transparency and shadow values are required", null)
+          } else {
+            getSharedPreferences(CounterWidgetProvider.PREFERENCES_NAME, Context.MODE_PRIVATE)
+              .edit()
+              .putInt(CounterWidgetProvider.TRANSPARENCY_KEY, transparency.coerceIn(0, 100))
+              .putInt(CounterWidgetProvider.SHADOW_KEY, shadow.coerceIn(0, 100))
+              .apply()
+            refreshCounterWidget()
+            result.success(true)
+          }
+        }
         "saveCounter" -> {
           val countToSave = call.argument<Int>("count")
           if (countToSave != null) {
@@ -29,10 +59,7 @@ class MainActivity : FlutterActivity() {
               .putInt(CounterWidgetProvider.COUNTER_KEY, countToSave)
               .apply()
 
-            val manager = AppWidgetManager.getInstance(this)
-            val component = ComponentName(this, CounterWidgetProvider::class.java)
-            val widgetIds = manager.getAppWidgetIds(component)
-            CounterWidgetProvider().onUpdate(this, manager, widgetIds)
+            refreshCounterWidget()
             result.success(true)
           } else {
             result.error("INVALID_ARGUMENT", "Count argument is required", null)
@@ -44,5 +71,12 @@ class MainActivity : FlutterActivity() {
         }
       }
       }
+  }
+
+  private fun refreshCounterWidget() {
+    val manager = AppWidgetManager.getInstance(this)
+    val component = ComponentName(this, CounterWidgetProvider::class.java)
+    val widgetIds = manager.getAppWidgetIds(component)
+    CounterWidgetProvider().onUpdate(this, manager, widgetIds)
   }
 }

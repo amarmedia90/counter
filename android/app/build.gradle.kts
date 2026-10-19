@@ -4,6 +4,10 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+dependencies {
+    implementation("androidx.core:core-remoteviews:1.1.0")
+}
+
 android {
     namespace = "com.counter.counter"
     compileSdk = flutter.compileSdkVersion
